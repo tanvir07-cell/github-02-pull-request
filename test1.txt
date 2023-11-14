@@ -1,1 +1,1 @@
-This is the test1 updated file inside the pr1 branch
+This is the simple test1 updated file inside the main branch
