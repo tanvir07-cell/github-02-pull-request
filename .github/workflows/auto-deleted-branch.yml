@@ -1,0 +1,27 @@
+name: Delete Branch After Merge
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  delete-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Delete branch
+        run: |
+          # Get the current branch name from the event payload
+          branch_name=$(jq -r '.pull_request.head.ref' "$GITHUB_EVENT_PATH")
+
+          # Check if the pull request was merged
+          if [ "${{ github.event_name }}" == "pull_request" ] && [ "${{ github.event.action }}" == "closed" ] && [ "$(jq -r '.pull_request.merged' "$GITHUB_EVENT_PATH")" == "true" ]; then
+            echo "Deleting branch $branch_name"
+            git push origin --delete "$branch_name"
+          else
+            echo "Pull request was not merged. Branch will not be deleted."
+          fi
